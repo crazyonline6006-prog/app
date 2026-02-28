@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
@@ -10,7 +11,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 export const LoginScreen = () => {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,7 @@ export const LoginScreen = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             navigation.replace('MainTabs');
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
             Alert.alert("Login Failed", error.message);
         } finally {
@@ -34,7 +35,7 @@ export const LoginScreen = () => {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+        <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={tw`flex-1`}
@@ -45,7 +46,7 @@ export const LoginScreen = () => {
 
                         {/* Header Section */}
                         <View style={tw`items-center pt-8 pb-6 relative z-10`}>
-                            <View style={tw`w-20 h-20 mb-6 bg-charcoal-light rounded-xl items-center justify-center shadow-lg border border-[#325567]/30`}>
+                            <View style={tw`w-20 h-20 mb-6 bg-[#192b33] rounded-xl items-center justify-center shadow-lg border border-[#325567]/30`}>
                                 <MaterialIcons name="eco" size={48} color={colors.primary} />
                             </View>
                             <Text style={tw`text-3xl font-bold tracking-tight text-center mb-2 text-white`}>
@@ -71,7 +72,7 @@ export const LoginScreen = () => {
                             />
 
                             {/* Password Input */}
-                            <View style={tw`space-y-2`}>
+                            <View style={tw`gap-2`}>
                                 <Input
                                     label="Password"
                                     icon="lock"
@@ -121,7 +122,7 @@ export const LoginScreen = () => {
                         </View>
 
                         {/* Footer */}
-                        <View style={tw`p-6 text-center z-10 pb-10 mt-4 flex-row justify-center`}>
+                        <View style={tw`p-6 z-10 pb-10 mt-4 flex-row justify-center`}>
                             <Text style={tw`text-slate-400 text-sm`}>
                                 New to Spliffy?{' '}
                             </Text>

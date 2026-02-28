@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { ImageBackground } from 'expo-image';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
-import { Product } from '../data/mockData';
+
 import { useCart } from '../context/CartContext';
 
 export const ProductDetailsScreen = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
-  const product: Product = route.params?.product || {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const product = route.params?.product || {
     product_name: 'Product Details',
     price_min: 0,
     description: 'No description available',
@@ -124,15 +124,15 @@ export const ProductDetailsScreen = () => {
                     <TouchableOpacity
                       key={variant.variant_id}
                       onPress={() => setSelectedVariant(variant)}
-                      style={tw`relative flex-col items-center justify-center p-3 rounded-2xl w-[23%] ${isSelected
-                        ? 'bg-[#2b9dee] border border-[#2b9dee] shadow-lg shadow-[#2b9dee]/25'
-                        : 'bg-[#1A1D23] border border-white/5'
-                        }`}
+                      style={[tw`relative flex-col items-center justify-center p-3 rounded-2xl w-[23%]`, isSelected
+                        ? tw`bg-[#2b9dee] border border-[#2b9dee] shadow-lg`
+                        : tw`bg-[#1A1D23] border border-white/5`
+                      ]}
                     >
-                      <Text style={tw`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#94a3b8]'}`}>
+                      <Text style={[tw`text-sm font-bold`, isSelected ? tw`text-white` : tw`text-[#94a3b8]`]}>
                         {variant.variant_name}
                       </Text>
-                      <Text style={tw`text-[10px] ${isSelected ? 'opacity-80 text-white' : 'opacity-60 text-[#94a3b8]'}`}>
+                      <Text style={[tw`text-[10px]`, isSelected ? { opacity: 0.8, color: 'white' } : { opacity: 0.6, color: '#94a3b8' }]}>
                         ${variant.price.toFixed(2)}
                       </Text>
                       {isSelected && (
@@ -193,7 +193,7 @@ export const ProductDetailsScreen = () => {
             </Text>
           </View>
           <TouchableOpacity
-            style={tw`flex-1 bg-[#2b9dee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg shadow-[#2b9dee]/20`}
+            style={tw`flex-1 bg-[#2b9dee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg`}
             onPress={handleAddToCart}
           >
             <MaterialIcons name="shopping-bag" size={24} color="white" />

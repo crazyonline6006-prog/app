@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, TextInput } from 'react-native';
-import { ImageBackground } from 'expo-image';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, TextInput, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
@@ -10,9 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AddressModal } from '../components/AddressModal';
 
 export const HomeScreen = () => {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation();
     const { user } = useAuth();
-    const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [isAddressModalVisible, setAddressModalVisible] = useState(false);
@@ -55,7 +56,7 @@ export const HomeScreen = () => {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+        <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
             {/* Dynamic Header */}
             <View style={tw`flex-row items-center justify-between px-4 pt-6 pb-2 z-10`}>
                 <TouchableOpacity
@@ -137,7 +138,7 @@ export const HomeScreen = () => {
                                 onPress={() => navigation.navigate('ProductsList', { searchQuery: cat.name })}
                             >
                                 <View style={tw`w-16 h-16 rounded-2xl bg-[#192b33] border border-[#233c48] items-center justify-center`}>
-                                    <MaterialIcons name={cat.icon as any} size={28} color="#2badee" />
+                                    <MaterialIcons name={cat.icon} size={28} color="#2badee" />
                                 </View>
                                 <Text style={tw`text-xs font-medium text-slate-300 w-16 text-center leading-tight`}>{cat.name}</Text>
                             </TouchableOpacity>
@@ -164,9 +165,10 @@ export const HomeScreen = () => {
                                     activeOpacity={0.9}
                                 >
                                     <View style={tw`w-full aspect-square bg-[#101c22]`}>
-                                        <ImageBackground
+                                        <Image
                                             source={{ uri: product.product_image || 'https://via.placeholder.com/150' }}
                                             style={tw`w-full h-full`}
+                                            contentFit="cover"
                                         />
                                     </View>
                                     <View style={tw`p-3 flex-col gap-1`}>

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import { useCart } from '../context/CartContext';
 
 export const PaymentsScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const { total, clearCart } = useCart();
   const [selectedCard, setSelectedCard] = useState('visa');
 
@@ -31,9 +32,9 @@ export const PaymentsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+    <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
       {/* Header */}
-      <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-4 bg-background-light dark:bg-background-dark shrink-0`}>
+      <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-4 bg-[#101c22] shrink-0`}>
         <View style={tw`flex-row items-center gap-4`}>
           <TouchableOpacity
             style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#192b33]/50`}
@@ -55,7 +56,7 @@ export const PaymentsScreen = () => {
           <TouchableOpacity
             onPress={() => setSelectedCard('visa')}
             activeOpacity={0.9}
-            style={tw`w-full aspect-[1.58/1] rounded-2xl overflow-hidden shadow-lg bg-[#064e3b] ${selectedCard === 'visa' ? 'border-2 border-[#2badee]' : 'opacity-60'}`}
+            style={[tw`w-full rounded-2xl overflow-hidden shadow-lg bg-[#064e3b]`, { aspectRatio: 1.58 }, selectedCard === 'visa' ? tw`border-2 border-[#2badee]` : { opacity: 0.6 }]}
           >
             {/* Abstract representations of gradient/textures */}
             <View style={tw`absolute inset-0 bg-black/40`} />
@@ -89,7 +90,7 @@ export const PaymentsScreen = () => {
           <TouchableOpacity
             onPress={() => setSelectedCard('mastercard')}
             activeOpacity={0.9}
-            style={tw`relative w-full aspect-[1.58/1] rounded-2xl overflow-hidden shadow-lg bg-[#312e81] ${selectedCard === 'mastercard' ? 'border-2 border-[#2badee]' : 'opacity-60'}`}
+            style={[tw`relative w-full rounded-2xl overflow-hidden shadow-lg bg-[#312e81]`, { aspectRatio: 1.58 }, selectedCard === 'mastercard' ? tw`border-2 border-[#2badee]` : { opacity: 0.6 }]}
           >
             {/* Abstract representations of gradient/textures */}
             <View style={tw`absolute inset-0 bg-black/40`} />
@@ -124,7 +125,7 @@ export const PaymentsScreen = () => {
 
         {/* Add Payment Button */}
         <View style={tw`mb-8`}>
-          <TouchableOpacity style={tw`w-full h-14 bg-[#2badee] flex-row items-center justify-center gap-2 rounded-xl shadow-lg shadow-[#2badee]/20`}>
+          <TouchableOpacity style={tw`w-full h-14 bg-[#2badee] flex-row items-center justify-center gap-2 rounded-xl shadow-lg`}>
             <MaterialIcons name="add" size={20} color="#101c22" />
             <Text style={tw`text-[#101c22] font-bold text-base`}>Add New Payment Method</Text>
           </TouchableOpacity>
@@ -175,7 +176,7 @@ export const PaymentsScreen = () => {
         </View>
 
         {/* Footer Note */}
-        <View style={tw`py-8 text-center`}>
+        <View style={tw`py-8 items-center`}>
           <Text style={tw`text-xs text-slate-500 text-center`}>
             Your payment information is securely stored.{"\n"}
             Spliffy does not share your financial details with merchants.
@@ -187,7 +188,7 @@ export const PaymentsScreen = () => {
       {total > 0 && (
         <View style={tw`absolute bottom-0 w-full px-5 py-6 bg-[#0F1115]/95 border-t border-[#233c48] z-40`}>
           <TouchableOpacity
-            style={tw`w-full bg-[#2badee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg shadow-[#2badee]/20`}
+            style={tw`w-full bg-[#2badee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg`}
             onPress={handleCheckout}
           >
             <MaterialIcons name="lock" size={20} color="white" />

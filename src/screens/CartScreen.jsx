@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -7,15 +8,15 @@ import tw from 'twrnc';
 import { useCart } from '../context/CartContext';
 
 export const CartScreen = () => {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation();
     const { items, updateQuantity, removeFromCart, subtotal, tax, total } = useCart();
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+        <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
             {/* Header */}
-            <View style={tw`flex-row items-center px-4 pt-6 pb-4 bg-background-dark z-10 border-b border-[#233c48]`}>
+            <View style={tw`flex-row items-center px-4 pt-6 pb-4 bg-[#101c22] z-10 border-b border-[#233c48]`}>
                 <TouchableOpacity
-                    style={tw`w-10 h-10 items-center justify-center rounded-full hover:bg-[#233c48]`}
+                    style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#233c48]`}
                     onPress={() => navigation.goBack()}
                 >
                     <MaterialIcons name="arrow-back" size={24} color="white" />
@@ -32,7 +33,7 @@ export const CartScreen = () => {
                         <Text style={tw`text-2xl font-bold text-white mb-2 text-center`}>Your bag is empty</Text>
                         <Text style={tw`text-[#94a3b8] text-center mb-8`}>Looks like you haven't added anything to your bag yet.</Text>
                         <TouchableOpacity
-                            style={tw`bg-[#2badee] px-8 py-4 rounded-xl shadow-lg shadow-[#2badee]/20`}
+                            style={tw`bg-[#2badee] px-8 py-4 rounded-xl shadow-lg`}
                             onPress={() => navigation.navigate('MainTabs')}
                         >
                             <Text style={tw`text-white font-bold text-lg`}>Browse Menu</Text>
@@ -53,7 +54,7 @@ export const CartScreen = () => {
                                     <View style={tw`flex-1 flex-col justify-between`}>
                                         <View style={tw`flex-row justify-between items-start`}>
                                             <View style={tw`flex-1 pr-2`}>
-                                                <Text style={tw`text-white font-bold text-base line-clamp-1`}>{item.product.product_name}</Text>
+                                                <Text style={tw`text-white font-bold text-base`}>{item.product.product_name}</Text>
                                                 <Text style={tw`text-[#94a3b8] text-xs mt-1`}>{item.variant.variant_name}</Text>
                                             </View>
                                             <TouchableOpacity
@@ -121,7 +122,7 @@ export const CartScreen = () => {
             {items.length > 0 && (
                 <View style={tw`absolute bottom-0 w-full px-5 py-4 bg-[#0F1115]/95 border-t border-[#233c48] z-40`}>
                     <TouchableOpacity
-                        style={tw`w-full bg-[#2badee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg shadow-[#2badee]/20`}
+                        style={tw`w-full bg-[#2badee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg`}
                         onPress={() => navigation.navigate('Payments')}
                     >
                         <Text style={tw`text-white font-bold text-lg mr-2`}>Checkout</Text>

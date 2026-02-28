@@ -15,13 +15,13 @@ export const AgeVerificationModal = () => {
                 }
             } catch (error) {
                 console.error("Error checking age verification status:", error);
-                setIsVisible(true); // Default to showing if there's an error
+                setIsVisible(true);
             }
         };
         checkVerification();
     }, []);
 
-    const handleVerify = async (isOfAge: boolean) => {
+    const handleVerify = async (isOfAge) => {
         if (isOfAge) {
             try {
                 await AsyncStorage.setItem('ageVerified', 'true');
@@ -39,10 +39,10 @@ export const AgeVerificationModal = () => {
             animationType="fade"
             transparent={true}
             visible={isVisible}
-            onRequestClose={() => { }} // Prevent Android back button from dismissing
+            onRequestClose={() => { }}
         >
             <View style={tw`flex-1 bg-black/95 justify-center items-center px-6`}>
-                <View style={tw`bg-[#101c22] border border-[#233c48] rounded-3xl p-8 w-full items-center shadow-xl shadow-black`}>
+                <View style={tw`bg-[#101c22] border border-[#233c48] rounded-3xl p-8 w-full items-center shadow-xl`}>
                     <View style={tw`w-16 h-16 rounded-full bg-[#192b33] border border-[#325567] mb-6 justify-center items-center`}>
                         <Text style={tw`text-2xl font-bold text-[#2badee]`}>21+</Text>
                     </View>

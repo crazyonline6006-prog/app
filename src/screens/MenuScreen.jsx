@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, TextInput } from 'react-native';
-import { ImageBackground } from 'expo-image';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, TextInput, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
-import { Category, getStoreData } from '../data/firestoreService';
+import { getStoreData } from '../data/firestoreService';
 
 export const MenuScreen = () => {
-  const navigation = useNavigation<any>();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const navigation = useNavigation();
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const MenuScreen = () => {
     fetchCategories();
   }, []);
 
-  const getCategoryIcon = (name: string): keyof typeof MaterialIcons.glyphMap => {
+  const getCategoryIcon = (name) => {
     switch (name) {
       case 'THCa Flower': return 'local-florist';
       case 'Edibles': return 'cookie';
@@ -38,22 +38,22 @@ export const MenuScreen = () => {
     }
   };
 
-  const getCategoryColor = (name: string): string => {
+  const getCategoryColor = (name) => {
     switch (name) {
-      case 'THCa Flower': return 'text-[#8b5cf6]'; // Purple
-      case 'Edibles': return 'text-[#f59e0b]'; // Amber
-      case 'Vapes': return 'text-[#0ea5e9]'; // Sky blue
-      case 'Concentrates': return 'text-[#f43f5e]'; // Rose
-      case 'Accessories': return 'text-[#64748b]'; // Slate
-      case 'CBD Options': return 'text-[#10b981]'; // Emerald
-      default: return 'text-[#2badee]';
+      case 'THCa Flower': return '#8b5cf6';
+      case 'Edibles': return '#f59e0b';
+      case 'Vapes': return '#0ea5e9';
+      case 'Concentrates': return '#f43f5e';
+      case 'Accessories': return '#64748b';
+      case 'CBD Options': return '#10b981';
+      default: return '#2badee';
     }
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+    <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
       {/* Search Header */}
-      <View style={tw`flex-row items-center justify-between px-4 pt-6 pb-2 bg-background-light dark:bg-background-dark shrink-0 relative z-10 border-b border-slate-800/50`}>
+      <View style={tw`flex-row items-center justify-between px-4 pt-6 pb-2 bg-[#101c22] shrink-0 relative z-10 border-b border-slate-800/50`}>
         <View style={tw`flex-row items-center w-full h-12 bg-[#192b33] rounded-xl px-4 shadow-lg`}>
           <MaterialIcons name="search" size={24} color="#64748b" />
           <TextInput
@@ -116,7 +116,7 @@ export const MenuScreen = () => {
                     onPress={() => navigation.navigate('ProductsList', { category: cat })}
                   >
                     <View style={tw`w-16 h-16 mb-3 rounded-full bg-[#101c22] items-center justify-center shadow-lg`}>
-                      <MaterialIcons name={getCategoryIcon(cat.category_name)} size={32} style={tw`${getCategoryColor(cat.category_name)} `} />
+                      <MaterialIcons name={getCategoryIcon(cat.category_name)} size={32} color={getCategoryColor(cat.category_name)} />
                     </View>
                     <Text style={tw`text-base font-bold text-white text-center`}>{cat.category_name}</Text>
                     <Text style={tw`text-xs text-slate-400 mt-1 text-center`}>{cat.category_description || 'View Products'}</Text>

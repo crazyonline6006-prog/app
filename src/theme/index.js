@@ -12,7 +12,6 @@ export const colors = {
     transparent: 'transparent',
 };
 
-// Common tailwind mapping shortcuts for rapid styling
 export const themeClasses = {
     containerDark: 'flex-1 bg-[#101c22]',
     containerLight: 'flex-1 bg-[#f6f7f8]',

@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { ImageBackground } from 'expo-image';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
 import { useCart } from '../context/CartContext';
-import { Category, Product, getAllProducts } from '../data/firestoreService';
+import { getAllProducts } from '../data/firestoreService';
 
 export const ProductsListScreen = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+  const navigation = useNavigation();
+  const route = useRoute();
   const { addToCart } = useCart();
 
-  const category: Category | undefined = route.params?.category;
-  const initialSearchQuery: string = route.params?.searchQuery || '';
+  const category = route.params?.category;
+  const initialSearchQuery = route.params?.searchQuery || '';
 
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAndFilterProducts = async () => {
       setLoading(true);
       try {
-        let prods: Product[] = [];
+        let prods = [];
 
         if (category) {
           // If a specific category was passed, use its products.
-          const getProductsFromCategory = (cat: Category): Product[] => {
-            let p: Product[] = cat.products ? [...cat.products] : [];
+          const getProductsFromCategory = (cat) => {
+            let p = cat.products ? [...cat.products] : [];
             if (cat.children) {
               cat.children.forEach(child => {
-                p = [...p, ...getProductsFromCategory(child as Category)];
+                p = [...p, ...getProductsFromCategory(child)];
               });
             }
             return p;
@@ -62,11 +62,11 @@ export const ProductsListScreen = () => {
 
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+    <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
       {/* Header */}
-      <View style={tw`flex-row items-center justify-between bg-background-dark/95 px-4 py-4 border-b border-[#233c48] z-20`}>
+      <View style={tw`flex-row items-center justify-between bg-[#101c22]/95 px-4 py-4 border-b border-[#233c48] z-20`}>
         <TouchableOpacity
-          style={tw`w-10 h-10 items-center justify-center rounded-full hover:bg-[#233c48]`}
+          style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#233c48]`}
           onPress={() => navigation.goBack()}
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
@@ -74,13 +74,13 @@ export const ProductsListScreen = () => {
         <Text style={tw`text-white text-lg font-bold leading-tight flex-1 text-center`} numberOfLines={1}>
           {category ? category.category_name : (initialSearchQuery ? `Search: ${initialSearchQuery}` : 'All Products')}
         </Text>
-        <TouchableOpacity style={tw`w-10 h-10 items-center justify-center rounded-full hover:bg-[#233c48]`}>
+        <TouchableOpacity style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#233c48]`}>
           <MaterialIcons name="search" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Filter & Sort Bar */}
-      <View style={tw`flex-row gap-3 px-4 py-3 bg-background-dark border-b border-[#233c48] z-10`}>
+      <View style={tw`flex-row gap-3 px-4 py-3 bg-[#101c22] border-b border-[#233c48] z-10`}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-3`}>
           <TouchableOpacity style={tw`flex-row h-9 items-center justify-center gap-2 rounded-lg bg-[#233c48] px-3`}>
             <MaterialIcons name="sort" size={20} color="white" />
@@ -125,7 +125,7 @@ export const ProductsListScreen = () => {
                 <View style={tw`flex-1 flex-col justify-between py-1`}>
                   <View style={tw`flex-col gap-1`}>
                     <View style={tw`flex-row items-center justify-between`}>
-                      <Text style={tw`text-[#2badee] text-[11px] font-bold uppercase tracking-wider line-clamp-1`}>
+                      <Text style={tw`text-[#2badee] text-[11px] font-bold uppercase tracking-wider`}>
                         {product.brand || 'Spliffy Selects'}
                       </Text>
                       <View style={tw`flex-row items-center gap-1`}>
@@ -152,7 +152,7 @@ export const ProductsListScreen = () => {
                   <View style={tw`flex-row items-end justify-between mt-2`}>
                     <Text style={tw`text-lg font-bold text-white`}>${product.price_min?.toFixed(2) || '0.00'}</Text>
                     <TouchableOpacity
-                      style={tw`flex h-8 w-8 items-center justify-center rounded-full bg-[#2badee] shadow-md shadow-[#2badee]/20`}
+                      style={tw`flex h-8 w-8 items-center justify-center rounded-full bg-[#2badee] shadow-md`}
                       onPress={(e) => {
                         e.stopPropagation(); // Prevent navigating to details
                         if (product.variants && product.variants.length > 0) {

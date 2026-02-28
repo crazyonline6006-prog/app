@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
@@ -11,7 +12,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
 export const SignUpScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const [ageVerified, setAgeVerified] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +46,7 @@ export const SignUpScreen = () => {
       });
 
       navigation.replace('MainTabs');
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
       Alert.alert("Sign Up Failed", error.message);
     } finally {
@@ -54,11 +55,11 @@ export const SignUpScreen = () => {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+    <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
       {/* Top Bar */}
       <View style={tw`flex-row items-center px-4 pt-6 pb-2 justify-between z-10`}>
         <TouchableOpacity
-          style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#192b33]/0 hover:bg-[#192b33]/50`}
+          style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#192b33]/50`}
           onPress={() => navigation.goBack()}
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
@@ -84,7 +85,7 @@ export const SignUpScreen = () => {
           </View>
 
           {/* Form */}
-          <View style={tw`space-y-5 flex-col gap-4`}>
+          <View style={tw`flex-col gap-4`}>
             <Input
               label="Full Name"
               icon="person"
@@ -129,7 +130,7 @@ export const SignUpScreen = () => {
               disabled={isLoading}
               activeOpacity={0.8}
             >
-              <View style={tw`w-5 h-5 rounded border ${ageVerified ? 'bg-[#2badee] border-[#2badee]' : 'bg-[#192b33] border-[#2badee]/50'} items-center justify-center`}>
+              <View style={[tw`w-5 h-5 rounded border items-center justify-center`, ageVerified ? tw`bg-[#2badee] border-[#2badee]` : tw`bg-[#192b33] border-[#2badee]/50`]}>
                 {ageVerified && <MaterialIcons name="check" size={16} color="white" />}
               </View>
               <Text style={tw`flex-1 text-sm leading-tight text-slate-300`}>
@@ -167,7 +168,7 @@ export const SignUpScreen = () => {
           </View>
 
           {/* Footer Link */}
-          <View style={tw`mt-8 text-center pb-6 flex-row justify-center`}>
+          <View style={tw`mt-8 pb-6 flex-row justify-center`}>
             <Text style={tw`text-slate-400 text-sm`}>
               Already have an account?{' '}
             </Text>

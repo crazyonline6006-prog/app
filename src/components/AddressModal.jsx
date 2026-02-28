@@ -1,14 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Alert, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
-interface AddressModalProps {
-    isVisible: boolean;
-    onClose: () => void;
-    onSelectZone: (zone: string) => void;
-}
 
 const ZONES = [
     { id: '1', name: 'Downtown Center', available: true },
@@ -18,9 +12,9 @@ const ZONES = [
     { id: '5', name: 'Out of State / Unserviceable', available: false },
 ];
 
-export const AddressModal: React.FC<AddressModalProps> = ({ isVisible, onClose, onSelectZone }) => {
+export const AddressModal = ({ isVisible, onClose, onSelectZone }) => {
 
-    const handleSelect = async (zone: typeof ZONES[0]) => {
+    const handleSelect = async (zone) => {
         if (zone.available) {
             try {
                 await AsyncStorage.setItem('deliveryZone', zone.name);
@@ -59,7 +53,10 @@ export const AddressModal: React.FC<AddressModalProps> = ({ isVisible, onClose, 
                         keyExtractor={item => item.id}
                         renderItem={({ item }) => (
                             <TouchableOpacity
-                                style={tw`flex-row items-center justify-between p-4 mb-3 rounded-xl border ${item.available ? 'bg-[#192b33] border-[#325567]' : 'bg-[#192b33]/50 border-[#233c48]'}`}
+                                style={[
+                                    tw`flex-row items-center justify-between p-4 mb-3 rounded-xl border`,
+                                    item.available ? tw`bg-[#192b33] border-[#325567]` : tw`bg-[#192b33]/50 border-[#233c48]`
+                                ]}
                                 onPress={() => handleSelect(item)}
                             >
                                 <View style={tw`flex-row items-center gap-3`}>
@@ -69,7 +66,7 @@ export const AddressModal: React.FC<AddressModalProps> = ({ isVisible, onClose, 
                                         color={item.available ? "#2badee" : "#64748b"}
                                     />
                                     <View>
-                                        <Text style={tw`text-white font-bold text-base ${!item.available ? 'text-slate-500' : ''}`}>
+                                        <Text style={[tw`text-white font-bold text-base`, !item.available && tw`text-slate-500`]}>
                                             {item.name}
                                         </Text>
                                         {item.available && <Text style={tw`text-[#2badee] text-xs mt-1`}>Delivery Available</Text>}

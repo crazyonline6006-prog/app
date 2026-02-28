@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
-import { ImageBackground } from 'expo-image';
+import { View, Text, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 
 export const OrdersScreen = () => {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
+        <SafeAreaView style={tw`flex-1 bg-[#101c22]`}>
             {/* Header */}
-            <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-4 bg-background-light dark:bg-background-dark z-10`}>
+            <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-4 bg-[#101c22] z-10`}>
                 <Text style={tw`text-2xl font-bold tracking-tight text-white`}>My Orders</Text>
                 <TouchableOpacity style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#192b33]/50`}>
                     <MaterialIcons name="settings" size={20} color="#92b7c9" />
@@ -68,10 +68,10 @@ export const OrdersScreen = () => {
                                         { icon: 'home', label: 'Arrived', active: false, color: '#92b7c9' }
                                     ].map((step, index) => (
                                         <View key={index} style={tw`items-center w-12`}>
-                                            <View style={tw`w-6 h-6 rounded-full mb-1 items-center justify-center ${step.active ? `bg-[${step.color}]` : 'bg-[#233c48]'}`}>
-                                                <MaterialIcons name={step.icon as any} size={14} color={step.active ? '#101c22' : '#92b7c9'} />
+                                            <View style={[tw`w-6 h-6 rounded-full mb-1 items-center justify-center`, { backgroundColor: step.active ? step.color : '#233c48' }]}>
+                                                <MaterialIcons name={step.icon} size={14} color={step.active ? '#101c22' : '#92b7c9'} />
                                             </View>
-                                            <Text style={tw`text-[10px] ${step.active ? `text-[${step.color}] font-bold` : 'text-[#92b7c9] font-medium'}`}>{step.label}</Text>
+                                            <Text style={[tw`text-[10px]`, { color: step.active ? step.color : '#92b7c9', fontWeight: step.active ? 'bold' : '500' }]}>{step.label}</Text>
                                         </View>
                                     ))}
                                 </View>
