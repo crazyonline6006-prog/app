@@ -1,41 +1,78 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, ImageBackground, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { ImageBackground } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
-import { Category, Product } from '../data/mockData';
-import { colors } from '../theme';
+import { useCart } from '../context/CartContext';
+import { Category, Product, getAllProducts } from '../data/firestoreService';
 
 export const ProductsListScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const category: Category = route.params?.category || { category_name: 'Products', products: [] };
-  
-  // Flatten products if there are children categories
-  const getProducts = (cat: Category): Product[] => {
-    let prods: Product[] = cat.products ? [...cat.products] : [];
-    if (cat.children) {
-      cat.children.forEach(child => {
-        prods = [...prods, ...getProducts(child)];
-      });
-    }
-    return prods;
-  };
+  const { addToCart } = useCart();
 
-  const allProducts = getProducts(category);
+  const category: Category | undefined = route.params?.category;
+  const initialSearchQuery: string = route.params?.searchQuery || '';
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAndFilterProducts = async () => {
+      setLoading(true);
+      try {
+        let prods: Product[] = [];
+
+        if (category) {
+          // If a specific category was passed, use its products.
+          const getProductsFromCategory = (cat: Category): Product[] => {
+            let p: Product[] = cat.products ? [...cat.products] : [];
+            if (cat.children) {
+              cat.children.forEach(child => {
+                p = [...p, ...getProductsFromCategory(child as Category)];
+              });
+            }
+            return p;
+          };
+          prods = getProductsFromCategory(category);
+        } else {
+          // Otherwise fetch all products (e.g., if arriving via search without a category)
+          prods = await getAllProducts();
+        }
+
+        // Apply search filter if query exists
+        if (initialSearchQuery) {
+          prods = prods.filter(p =>
+            p.product_name.toLowerCase().includes(initialSearchQuery.toLowerCase()) ||
+            (p.brand && p.brand.toLowerCase().includes(initialSearchQuery.toLowerCase()))
+          );
+        }
+
+        setProducts(prods);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAndFilterProducts();
+  }, [category, initialSearchQuery]);
+
 
   return (
     <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
       {/* Header */}
       <View style={tw`flex-row items-center justify-between bg-background-dark/95 px-4 py-4 border-b border-[#233c48] z-20`}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={tw`w-10 h-10 items-center justify-center rounded-full hover:bg-[#233c48]`}
           onPress={() => navigation.goBack()}
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={tw`text-white text-lg font-bold leading-tight flex-1 text-center`}>
-          {category.category_name}
+        <Text style={tw`text-white text-lg font-bold leading-tight flex-1 text-center`} numberOfLines={1}>
+          {category ? category.category_name : (initialSearchQuery ? `Search: ${initialSearchQuery}` : 'All Products')}
         </Text>
         <TouchableOpacity style={tw`w-10 h-10 items-center justify-center rounded-full hover:bg-[#233c48]`}>
           <MaterialIcons name="search" size={24} color="white" />
@@ -60,69 +97,80 @@ export const ProductsListScreen = () => {
 
       {/* Product List */}
       <ScrollView contentContainerStyle={tw`flex-col gap-4 p-4 pb-24`} showsVerticalScrollIndicator={false}>
-        {allProducts.map((product) => (
-          <TouchableOpacity 
-            key={product.product_id}
-            style={tw`flex-col gap-3 rounded-xl bg-[#192b33] p-3 shadow-lg`}
-            onPress={() => navigation.navigate('ProductDetails', { product })}
-            activeOpacity={0.9}
-          >
-            <View style={tw`flex-row gap-4`}>
-              {/* Image Container */}
-              <View style={tw`relative w-28 h-28 rounded-lg bg-[#233c48] overflow-hidden`}>
-                <ImageBackground 
-                  source={{ uri: product.product_image || 'https://via.placeholder.com/150' }}
-                  style={tw`w-full h-full`}
-                />
-                <View style={tw`absolute top-1 left-1 rounded bg-black/60 px-1.5 py-0.5`}>
-                  <Text style={tw`text-[10px] font-bold uppercase tracking-wider text-white`}>
-                    {product.cat_name || 'Hybrid'}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Content */}
-              <View style={tw`flex-1 flex-col justify-between py-1`}>
-                <View style={tw`flex-col gap-1`}>
-                  <View style={tw`flex-row items-center justify-between`}>
-                    <Text style={tw`text-[#2badee] text-[11px] font-bold uppercase tracking-wider line-clamp-1`}>
-                      {product.brand || 'Spliffy Selects'}
+        {loading ? (
+          <Text style={tw`text-center text-slate-400 py-10`}>Loading products...</Text>
+        ) : products.length > 0 ? (
+          products.map((product) => (
+            <TouchableOpacity
+              key={product.product_id}
+              style={tw`flex-col gap-3 rounded-xl bg-[#192b33] p-3 shadow-lg`}
+              onPress={() => navigation.navigate('ProductDetails', { product })}
+              activeOpacity={0.9}
+            >
+              <View style={tw`flex-row gap-4`}>
+                {/* Image Container */}
+                <View style={tw`relative w-28 h-28 rounded-lg bg-[#233c48] overflow-hidden`}>
+                  <ImageBackground
+                    source={{ uri: product.product_image || 'https://via.placeholder.com/150' }}
+                    style={tw`w-full h-full`}
+                  />
+                  <View style={tw`absolute top-1 left-1 rounded bg-black/60 px-1.5 py-0.5`}>
+                    <Text style={tw`text-[10px] font-bold uppercase tracking-wider text-white`}>
+                      {product.cat_name || 'Hybrid'}
                     </Text>
-                    <View style={tw`flex-row items-center gap-1`}>
-                      <MaterialIcons name="star" size={14} color="#facc15" />
-                      <Text style={tw`text-xs font-medium text-white`}>4.8</Text>
-                    </View>
-                  </View>
-                  <Text style={tw`text-white text-base font-bold leading-tight`} numberOfLines={2}>
-                    {product.product_name}
-                  </Text>
-                  
-                  <View style={tw`flex-row flex-wrap gap-2 pt-1`}>
-                    {product.thc_percent > 0 && (
-                      <View style={tw`rounded bg-[#233c48] px-1.5 py-0.5`}>
-                        <Text style={tw`text-[10px] font-medium text-[#92b7c9]`}>{product.thc_percent}% THC</Text>
-                      </View>
-                    )}
-                    <View style={tw`rounded bg-[#233c48] px-1.5 py-0.5`}>
-                      <Text style={tw`text-[10px] font-medium text-[#92b7c9]`}>Top Shelf</Text>
-                    </View>
                   </View>
                 </View>
 
-                <View style={tw`flex-row items-end justify-between mt-2`}>
-                  <Text style={tw`text-lg font-bold text-white`}>${product.price_min?.toFixed(2) || '0.00'}</Text>
-                  <TouchableOpacity style={tw`flex h-8 w-8 items-center justify-center rounded-full bg-[#2badee] shadow-md shadow-[#2badee]/20`}>
-                    <MaterialIcons name="add" size={20} color="white" />
-                  </TouchableOpacity>
+                {/* Content */}
+                <View style={tw`flex-1 flex-col justify-between py-1`}>
+                  <View style={tw`flex-col gap-1`}>
+                    <View style={tw`flex-row items-center justify-between`}>
+                      <Text style={tw`text-[#2badee] text-[11px] font-bold uppercase tracking-wider line-clamp-1`}>
+                        {product.brand || 'Spliffy Selects'}
+                      </Text>
+                      <View style={tw`flex-row items-center gap-1`}>
+                        <MaterialIcons name="star" size={14} color="#facc15" />
+                        <Text style={tw`text-xs font-medium text-white`}>4.8</Text>
+                      </View>
+                    </View>
+                    <Text style={tw`text-white text-base font-bold leading-tight`} numberOfLines={2}>
+                      {product.product_name}
+                    </Text>
+
+                    <View style={tw`flex-row flex-wrap gap-2 pt-1`}>
+                      {product.thc_percent > 0 && (
+                        <View style={tw`rounded bg-[#233c48] px-1.5 py-0.5`}>
+                          <Text style={tw`text-[10px] font-medium text-[#92b7c9]`}>{product.thc_percent}% THC</Text>
+                        </View>
+                      )}
+                      <View style={tw`rounded bg-[#233c48] px-1.5 py-0.5`}>
+                        <Text style={tw`text-[10px] font-medium text-[#92b7c9]`}>Top Shelf</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={tw`flex-row items-end justify-between mt-2`}>
+                    <Text style={tw`text-lg font-bold text-white`}>${product.price_min?.toFixed(2) || '0.00'}</Text>
+                    <TouchableOpacity
+                      style={tw`flex h-8 w-8 items-center justify-center rounded-full bg-[#2badee] shadow-md shadow-[#2badee]/20`}
+                      onPress={(e) => {
+                        e.stopPropagation(); // Prevent navigating to details
+                        if (product.variants && product.variants.length > 0) {
+                          addToCart(product, product.variants[0], 1);
+                          Alert.alert("Added", `${product.product_name} added to cart.`);
+                        }
+                      }}
+                    >
+                      <MaterialIcons name="add" size={20} color="white" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        {allProducts.length === 0 && (
+            </TouchableOpacity>
+          ))
+        ) : (
           <View style={tw`items-center justify-center py-10`}>
-            <Text style={tw`text-slate-400`}>No products found in this category.</Text>
+            <Text style={tw`text-slate-400`}>No products found matching your criteria.</Text>
           </View>
         )}
 

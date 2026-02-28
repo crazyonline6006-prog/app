@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { ImageBackground } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
 import { Product } from '../data/mockData';
+import { useCart } from '../context/CartContext';
 
 export const ProductDetailsScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const product: Product = route.params?.product || { 
-    product_name: 'Product Details', 
-    price_min: 0, 
+  const product: Product = route.params?.product || {
+    product_name: 'Product Details',
+    price_min: 0,
     description: 'No description available',
     variants: [],
     cat_name: 'Unknown',
@@ -19,7 +21,15 @@ export const ProductDetailsScreen = () => {
     product_image: 'https://via.placeholder.com/300'
   };
 
+  const { addToCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(product.variants?.[0]);
+  const [quantity, setQuantity] = useState(1);
+
+  const handleAddToCart = () => {
+    if (!selectedVariant) return;
+    addToCart(product, selectedVariant, quantity);
+    Alert.alert("Added to Cart", `${quantity}x ${product.product_name} added to your bag.`);
+  };
 
   return (
     <View style={tw`flex-1 bg-[#0F1115]`}>
@@ -34,7 +44,7 @@ export const ProductDetailsScreen = () => {
               {/* Note: React Native Expo gradients need expo-linear-gradient, using semi-transparent view for now */}
               <View style={tw`absolute inset-y-0 bottom-0 w-full h-[30%] bg-[#0F1115]/80`} />
             </View>
-            
+
             {/* Top Nav Overlay */}
             <SafeAreaView style={tw`w-full px-4 pt-4 flex-row justify-between items-center z-10`}>
               <TouchableOpacity
@@ -114,11 +124,10 @@ export const ProductDetailsScreen = () => {
                     <TouchableOpacity
                       key={variant.variant_id}
                       onPress={() => setSelectedVariant(variant)}
-                      style={tw`relative flex-col items-center justify-center p-3 rounded-2xl w-[23%] ${
-                        isSelected 
-                          ? 'bg-[#2b9dee] border border-[#2b9dee] shadow-lg shadow-[#2b9dee]/25' 
-                          : 'bg-[#1A1D23] border border-white/5'
-                      }`}
+                      style={tw`relative flex-col items-center justify-center p-3 rounded-2xl w-[23%] ${isSelected
+                        ? 'bg-[#2b9dee] border border-[#2b9dee] shadow-lg shadow-[#2b9dee]/25'
+                        : 'bg-[#1A1D23] border border-white/5'
+                        }`}
                     >
                       <Text style={tw`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#94a3b8]'}`}>
                         {variant.variant_name}
@@ -177,12 +186,16 @@ export const ProductDetailsScreen = () => {
       <View style={tw`absolute bottom-0 w-full px-5 py-4 bg-[#0F1115]/90 border-t border-white/5 z-40`}>
         <View style={tw`flex-row items-center justify-between gap-4`}>
           <View style={tw`flex-col`}>
-            <Text style={tw`text-xs text-[#94a3b8] font-medium`}>Total Price</Text>
+            {/* Quantity Selector could go here, omitting for layout simplicity for now */}
+            <Text style={tw`text-xs text-[#94a3b8] font-medium`}>Total</Text>
             <Text style={tw`text-2xl font-extrabold text-white tracking-tight`}>
-              ${(selectedVariant?.price || product.price_min || 0).toFixed(2)}
+              ${((selectedVariant?.price || product.price_min || 0) * quantity).toFixed(2)}
             </Text>
           </View>
-          <TouchableOpacity style={tw`flex-1 bg-[#2b9dee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg shadow-[#2b9dee]/20`}>
+          <TouchableOpacity
+            style={tw`flex-1 bg-[#2b9dee] h-14 rounded-full flex-row items-center justify-center gap-2 shadow-lg shadow-[#2b9dee]/20`}
+            onPress={handleAddToCart}
+          >
             <MaterialIcons name="shopping-bag" size={24} color="white" />
             <Text style={tw`text-white font-bold text-lg`}>Add to Bag</Text>
           </TouchableOpacity>

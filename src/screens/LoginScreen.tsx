@@ -1,14 +1,37 @@
-import React from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { colors } from '../theme';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 export const LoginScreen = () => {
     const navigation = useNavigation<any>();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert("Error", "Please fill in all fields.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            navigation.replace('MainTabs');
+        } catch (error: any) {
+            console.error(error);
+            Alert.alert("Login Failed", error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
@@ -42,6 +65,9 @@ export const LoginScreen = () => {
                                 placeholder="Enter your email"
                                 keyboardType="email-address"
                                 autoCapitalize="none"
+                                value={email}
+                                onChangeText={setEmail}
+                                editable={!isLoading}
                             />
 
                             {/* Password Input */}
@@ -51,9 +77,12 @@ export const LoginScreen = () => {
                                     icon="lock"
                                     placeholder="Enter your password"
                                     isPassword
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    editable={!isLoading}
                                 />
                                 <View style={tw`flex-row justify-end mt-2`}>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity disabled={isLoading}>
                                         <Text style={tw`text-sm font-semibold text-[#2badee]`}>
                                             Forgot Password?
                                         </Text>
@@ -63,9 +92,10 @@ export const LoginScreen = () => {
 
                             {/* Login Button */}
                             <Button
-                                title="Log In"
+                                title={isLoading ? "Logging in..." : "Log In"}
                                 style={tw`mt-2`}
-                                onPress={() => navigation.navigate('MainTabs')}
+                                onPress={handleLogin}
+                                disabled={isLoading}
                             />
 
                             {/* Divider */}

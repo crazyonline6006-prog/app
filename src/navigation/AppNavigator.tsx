@@ -8,17 +8,17 @@ import tw from 'twrnc';
 
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
+import { HomeScreen } from '../screens/HomeScreen';
 import { MenuScreen } from '../screens/MenuScreen';
 import { ProductsListScreen } from '../screens/ProductsListScreen';
 import { ProductDetailsScreen } from '../screens/ProductDetailsScreen';
 import { OrdersScreen } from '../screens/OrdersScreen';
 import { UserProfileScreen } from '../screens/UserProfileScreen';
 import { PaymentsScreen } from '../screens/PaymentsScreen';
+import { CartScreen } from '../screens/CartScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const PlaceholderScreen = () => <View style={tw`flex-1 bg-background-dark`} />;
 
 const MainTabs = () => {
   return (
@@ -32,25 +32,25 @@ const MainTabs = () => {
         tabBarLabelStyle: tw`text-[10px] font-medium tracking-wide pb-2`,
       }}
     >
-      <Tab.Screen 
-        name="Home" 
-        component={PlaceholderScreen} 
-        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={26} color={color} /> }} 
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={26} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Menu" 
-        component={MenuScreen} 
-        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="grid-view" size={26} color={color} /> }} 
+      <Tab.Screen
+        name="Menu"
+        component={MenuScreen}
+        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="grid-view" size={26} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Orders" 
-        component={OrdersScreen} 
-        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="receipt-long" size={26} color={color} /> }} 
+      <Tab.Screen
+        name="Orders"
+        component={OrdersScreen}
+        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="receipt-long" size={26} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Profile" 
-        component={UserProfileScreen} 
-        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="person" size={26} color={color} /> }} 
+      <Tab.Screen
+        name="Profile"
+        component={UserProfileScreen}
+        options={{ tabBarIcon: ({ color }) => <MaterialIcons name="person" size={26} color={color} /> }}
       />
     </Tab.Navigator>
   );
@@ -65,6 +65,7 @@ export const AppNavigator = () => {
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="ProductsList" component={ProductsListScreen} />
         <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+        <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="Payments" component={PaymentsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

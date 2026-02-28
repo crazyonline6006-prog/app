@@ -1,21 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { colors } from '../theme';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 
 export const SignUpScreen = () => {
   const navigation = useNavigation<any>();
   const [ageVerified, setAgeVerified] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!fullName || !email || !password) {
+      Alert.alert("Error", "Please fill in all required fields (Name, Email, Password).");
+      return;
+    }
+
+    if (!ageVerified) {
+      Alert.alert("Error", "You must verify that you are 21 years of age or older.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save additional user data in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        fullName,
+        email,
+        phone,
+        ageVerified: true,
+        createdAt: new Date().toISOString()
+      });
+
+      navigation.replace('MainTabs');
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert("Sign Up Failed", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={tw`flex-1 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100`}>
       {/* Top Bar */}
       <View style={tw`flex-row items-center px-4 pt-6 pb-2 justify-between z-10`}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={tw`w-10 h-10 items-center justify-center rounded-full bg-[#192b33]/0 hover:bg-[#192b33]/50`}
           onPress={() => navigation.goBack()}
         >
@@ -47,6 +89,9 @@ export const SignUpScreen = () => {
               label="Full Name"
               icon="person"
               placeholder="Enter your full name"
+              value={fullName}
+              onChangeText={setFullName}
+              editable={!isLoading}
             />
             <Input
               label="Email Address"
@@ -54,24 +99,34 @@ export const SignUpScreen = () => {
               placeholder="name@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              editable={!isLoading}
             />
             <Input
               label="Phone Number"
               icon="phone"
               placeholder="(555) 000-0000"
               keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
+              editable={!isLoading}
             />
             <Input
               label="Password"
               icon="lock"
               placeholder="••••••••"
               isPassword
+              value={password}
+              onChangeText={setPassword}
+              editable={!isLoading}
             />
 
             {/* Age Verification */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={tw`flex-row items-start gap-3 p-4 rounded-xl bg-[#2badee]/10 border border-[#2badee]/20 mt-2`}
               onPress={() => setAgeVerified(!ageVerified)}
+              disabled={isLoading}
               activeOpacity={0.8}
             >
               <View style={tw`w-5 h-5 rounded border ${ageVerified ? 'bg-[#2badee] border-[#2badee]' : 'bg-[#192b33] border-[#2badee]/50'} items-center justify-center`}>
@@ -82,10 +137,11 @@ export const SignUpScreen = () => {
               </Text>
             </TouchableOpacity>
 
-            <Button 
-              title="Create Account" 
+            <Button
+              title={isLoading ? "Creating Account..." : "Create Account"}
               style={tw`mt-4 font-bold text-lg h-14`}
-              onPress={() => navigation.navigate('MainTabs')} 
+              onPress={handleSignUp}
+              disabled={isLoading}
             />
           </View>
 

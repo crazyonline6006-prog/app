@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { ImageBackground } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
